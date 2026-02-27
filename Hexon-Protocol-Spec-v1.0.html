@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hexon — Open Memory Protocol Specification v1.0</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; color: #1a1a2e; background: #fff; font-size: 15px; line-height: 1.7; }
+
+  .cover { background: #1a1a2e; color: white; padding: 80px 60px; text-align: center; page-break-after: always; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; }
+  .cover .hex { font-size: 80px; margin-bottom: 10px; }
+  .cover h1 { font-size: 56px; font-weight: 900; letter-spacing: 4px; margin-bottom: 8px; }
+  .cover .subtitle { font-size: 22px; color: #f0a500; font-weight: 700; letter-spacing: 2px; margin-bottom: 30px; }
+  .cover .meta { color: #aaa; font-size: 14px; line-height: 2; margin-bottom: 40px; }
+  .cover blockquote { font-size: 18px; font-style: italic; color: #ddd; border-left: 3px solid #f0a500; padding-left: 20px; text-align: left; max-width: 600px; margin: 0 auto; }
+
+  .toc { padding: 60px; background: #f8f9fa; page-break-after: always; }
+  .toc h2 { font-size: 28px; color: #1a1a2e; margin-bottom: 30px; border-bottom: 3px solid #f0a500; padding-bottom: 10px; }
+  .toc ol { padding-left: 20px; }
+  .toc li { padding: 6px 0; font-size: 15px; color: #333; }
+  .toc li a { color: #1a1a2e; text-decoration: none; }
+  .toc li a:hover { color: #f0a500; }
+
+  .content { max-width: 900px; margin: 0 auto; padding: 60px 60px; }
+
+  h1.section { font-size: 32px; color: #1a1a2e; margin: 60px 0 20px; padding-bottom: 12px; border-bottom: 4px solid #f0a500; }
+  h2.subsection { font-size: 22px; color: #1a1a2e; margin: 40px 0 15px; }
+  h3.subsubsection { font-size: 17px; color: #1a1a2e; margin: 30px 0 10px; font-weight: 700; }
+
+  p { margin-bottom: 16px; color: #333; }
+
+  .infobox { background: #fff8e7; border-left: 4px solid #f0a500; padding: 16px 20px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .infobox p { margin: 4px 0; font-size: 14px; color: #555; }
+
+  .warnbox { background: #fff0f0; border-left: 4px solid #e74c3c; padding: 16px 20px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .warnbox p { margin: 4px 0; font-size: 14px; color: #555; }
+
+  table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
+  th { background: #1a1a2e; color: white; padding: 12px 16px; text-align: left; font-weight: 600; }
+  td { padding: 10px 16px; border-bottom: 1px solid #eee; color: #333; vertical-align: top; }
+  tr:nth-child(even) td { background: #f8f9fa; }
+  td:first-child { font-weight: 600; color: #1a1a2e; white-space: nowrap; }
+
+  pre { background: #f4f4f4; border-left: 4px solid #f0a500; padding: 16px 20px; margin: 16px 0; border-radius: 0 6px 6px 0; overflow-x: auto; font-family: 'Courier New', monospace; font-size: 13px; color: #333; line-height: 1.5; }
+
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { margin-bottom: 8px; color: #333; }
+
+  .faq-item { margin-bottom: 40px; padding: 24px; border: 1px solid #eee; border-radius: 8px; }
+  .faq-q { font-size: 17px; font-weight: 700; color: #1a1a2e; margin-bottom: 12px; }
+  .faq-q::before { content: "Q: "; color: #f0a500; }
+  .faq-a { color: #333; }
+  .faq-a::before { content: "A: "; font-weight: 700; color: #1a1a2e; }
+
+  .footer-doc { background: #1a1a2e; color: #aaa; text-align: center; padding: 40px 60px; margin-top: 80px; }
+  .footer-doc .tagline { font-size: 20px; color: white; font-style: italic; margin-bottom: 8px; }
+  .footer-doc .tagline2 { font-size: 20px; color: #f0a500; font-weight: 700; margin-bottom: 20px; }
+  .footer-doc .small { font-size: 13px; }
+
+  @media print {
+    .cover { min-height: auto; padding: 60px; }
+    .content { padding: 40px; }
+    h1.section { page-break-before: always; }
+  }
+
+  @media (max-width: 600px) {
+    .cover { padding: 40px 24px; }
+    .cover h1 { font-size: 36px; }
+    .content { padding: 30px 20px; }
+    .toc { padding: 30px 20px; }
+    td:first-child { white-space: normal; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="hex">⬡</div>
+  <h1>HEXON</h1>
+  <div class="subtitle">OPEN MEMORY PROTOCOL</div>
+  <div class="meta">
+    Protocol Specification v1.0<br>
+    February 2026<br>
+    Status: Draft for Community Review<br>
+    License: MIT — Free to implement, extend, and build upon
+  </div>
+  <blockquote>"Your memory. Your intelligence. Your soul. Nobody takes it from you. Ever."</blockquote>
+</div>
+
+<!-- TABLE OF CONTENTS -->
+<div class="toc">
+  <h2>Contents</h2>
+  <ol>
+    <li><a href="#abstract">Abstract</a></li>
+    <li><a href="#problem">The Problem This Solves</a></li>
+    <li><a href="#principles">Design Principles</a></li>
+    <li><a href="#datamodel">Memory Data Model</a></li>
+    <li><a href="#security">Security Model</a></li>
+    <li><a href="#api">API Specification</a></li>
+    <li><a href="#injection">Context Injection</a></li>
+    <li><a href="#implementation">Implementation Requirements</a></li>
+    <li><a href="#learning">Learning Memory</a></li>
+    <li><a href="#emergency">Emergency Trusted Access</a></li>
+    <li><a href="#versioning">Versioning &amp; Compatibility</a></li>
+    <li><a href="#quickstart">Developer Quick Start</a></li>
+    <li><a href="#faq">Objections &amp; Answers</a></li>
+    <li><a href="#opensource">Open Source &amp; Governance</a></li>
+  </ol>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+<!-- 1. ABSTRACT -->
+<h1 class="section" id="abstract">1. Abstract</h1>
+<p>The Hexon Open Memory Protocol (HOMP) defines a universal standard for storing, managing, and sharing personal AI memory across any artificial intelligence system, agent, application, or device. It is an open, vendor-neutral specification that any developer, company, or individual can implement freely.</p>
+<p>This document defines the complete protocol — the memory data model, security architecture, API specification, transport format, and implementation requirements — so that any product built on Hexon is fully interoperable with any other.</p>
+<div class="infobox">
+  <p>📄 Released under the MIT License. Free to use, build upon, and distribute.</p>
+  <p>💻 Reference implementation: github.com/misssally/hexon</p>
+  <p>🌍 Community: open an Issue on GitHub to contribute to this specification.</p>
+</div>
+
+<!-- 2. PROBLEM -->
+<h1 class="section" id="problem">2. The Problem This Solves</h1>
+<p>Hundreds of millions of people use AI every single day. They pour their entire lives into these systems — their fears, their ambitions, their health, their relationships, their most private thoughts.</p>
+<p>And then it all disappears. Every conversation starts from zero. Every AI is an island.</p>
+<table>
+  <tr><th>Failure</th><th>Description</th></tr>
+  <tr><td>Memory Lock-in</td><td>Your context is trapped inside each AI company's ecosystem. Switch AI — start again.</td></tr>
+  <tr><td>Zero Portability</td><td>Nothing travels with you across AIs, devices, or platforms. You rebuild yourself every time.</td></tr>
+  <tr><td>No Ownership</td><td>You have no control over what is stored about you, how it is used, or when it disappears.</td></tr>
+  <tr><td>Silo Fragmentation</td><td>Your Claude memory knows nothing about your ChatGPT history. Each AI has a partial picture at best.</td></tr>
+</table>
+<p>The Hexon Protocol solves all four failures with a single open standard.</p>
+
+<!-- 3. PRINCIPLES -->
+<h1 class="section" id="principles">3. Design Principles</h1>
+<p>Every decision in this specification is guided by these principles, in order of priority:</p>
+<table>
+  <tr><th>Principle</th><th>What It Means</th></tr>
+  <tr><td>User Ownership</td><td>Memory belongs entirely to the user. No implementation may store user memory on infrastructure the user does not control without explicit informed consent.</td></tr>
+  <tr><td>Privacy by Default</td><td>The most sensitive memory tiers are locked by default. No system receives sensitive data automatically.</td></tr>
+  <tr><td>Universal Compatibility</td><td>The protocol must work with any AI that accepts text input. No special integration required from AI providers.</td></tr>
+  <tr><td>Open &amp; Vendor-Neutral</td><td>No company owns this protocol. No implementation fee. No permission required.</td></tr>
+  <tr><td>Human-Readable</td><td>Memory is stored as structured JSON text. Any person can read, edit, or delete their own memory without technical expertise.</td></tr>
+  <tr><td>Graceful Degradation</td><td>If Hexon is unavailable, AI interactions continue normally. Hexon enhances — it never becomes a dependency.</td></tr>
+</table>
+
+<!-- 4. DATA MODEL -->
+<h1 class="section" id="datamodel">4. Memory Data Model</h1>
+
+<h2 class="subsection">4.1 The Memory Object</h2>
+<p>Every piece of information stored in a Hexon vault is a Memory Object. The schema is:</p>
+<pre>{
+  "id": "mem_a1b2c3d4",
+  "created": "2026-02-27T10:00:00Z",
+  "updated": "2026-02-27T18:30:00Z",
+  "category": "preferences",
+  "tier": "open",
+  "key": "communication_style",
+  "value": "Direct and concise. Dislikes waffle.",
+  "source": "conversation",
+  "confidence": 0.92,
+  "tags": ["communication", "personality"]
+}</pre>
+<table>
+  <tr><th>Field</th><th>Description</th></tr>
+  <tr><td>id</td><td>Unique identifier. Format: mem_ followed by 8 alphanumeric characters.</td></tr>
+  <tr><td>created / updated</td><td>ISO 8601 timestamps in UTC.</td></tr>
+  <tr><td>category</td><td>One of the standard categories defined in Section 4.2.</td></tr>
+  <tr><td>tier</td><td>Security tier: open, restricted, or confidential. See Section 5.</td></tr>
+  <tr><td>key</td><td>Snake_case descriptor of what this memory represents.</td></tr>
+  <tr><td>value</td><td>The memory content as a UTF-8 string. Maximum 10,000 characters.</td></tr>
+  <tr><td>source</td><td>How this memory was created: conversation, manual, import, or api.</td></tr>
+  <tr><td>confidence</td><td>Float 0.0–1.0. How confident the system is. 1.0 = user-confirmed.</td></tr>
+  <tr><td>tags</td><td>Optional array of strings for filtering and grouping.</td></tr>
+</table>
+
+<h2 class="subsection">4.2 Standard Memory Categories</h2>
+<table>
+  <tr><th>Category</th><th>What It Stores</th></tr>
+  <tr><td>identity</td><td>Name, pronouns, location, language, occupation, life stage.</td></tr>
+  <tr><td>preferences</td><td>Communication style, formatting, response length, topics of interest.</td></tr>
+  <tr><td>personality</td><td>Humour, values, emotional patterns, working style, decision-making approach.</td></tr>
+  <tr><td>knowledge</td><td>Professional expertise, skills, educational background, specialisms.</td></tr>
+  <tr><td>goals</td><td>Short and long-term ambitions, projects in progress, priorities.</td></tr>
+  <tr><td>health</td><td>Medical background, conditions, fitness context. Restricted tier by default.</td></tr>
+  <tr><td>financial</td><td>Financial situation and preferences. Restricted tier by default.</td></tr>
+  <tr><td>relationships</td><td>Important people, relationship context. Restricted tier by default.</td></tr>
+  <tr><td>history</td><td>Significant past events and experiences the user has shared.</td></tr>
+  <tr><td>custom</td><td>User-defined categories not covered by the standard set.</td></tr>
+</table>
+
+<h2 class="subsection">4.3 Vault Structure</h2>
+<pre>~/.hexon/
+  vault.json              # Vault metadata and settings
+  memories/
+    identity.json
+    preferences.json
+    personality.json
+    health.json           # Encrypted at rest
+    financial.json        # Encrypted at rest
+    relationships.json    # Encrypted at rest
+    custom/               # User-defined categories
+  access_log.json         # Complete audit trail
+  connections.json        # Registered apps and permissions</pre>
+
+<!-- 5. SECURITY -->
+<h1 class="section" id="security">5. Security Model</h1>
+
+<h2 class="subsection">5.1 Memory Tiers</h2>
+<table>
+  <tr><th>Tier</th><th>Access Rules</th></tr>
+  <tr><td>open</td><td>Any connected application with a valid API key may read these memories. Used for general preferences, communication style, and non-sensitive personality traits.</td></tr>
+  <tr><td>restricted</td><td>Only applications explicitly granted access to this category by the user may read these memories. Access is granted per-category per-application.</td></tr>
+  <tr><td>confidential</td><td>No application receives these memories automatically under any circumstances. Access requires the user to explicitly unlock for a specific session using PIN or biometric. Cannot be granted via API.</td></tr>
+</table>
+<div class="warnbox">
+  <p>⚠️ Health, financial, and relationship categories MUST default to restricted or confidential tier.</p>
+  <p>⚠️ Implementations MUST NOT allow any API to access confidential-tier memories under any circumstances.</p>
+  <p>⚠️ Users may promote memories to a higher tier. They may not demote below the category default.</p>
+</div>
+
+<h2 class="subsection">5.2 Encryption</h2>
+<p>Confidential-tier memories MUST be encrypted at rest using AES-256. The encryption key is derived from the user's PIN or passphrase and is never stored on the server.</p>
+<p>Restricted-tier memories SHOULD be encrypted at rest. All data in transit MUST use TLS 1.2 or higher.</p>
+
+<h2 class="subsection">5.3 Access Log</h2>
+<p>Every API call that reads, writes, or is blocked from accessing the vault MUST be logged immutably:</p>
+<pre>{
+  "timestamp": "2026-02-27T14:23:11Z",
+  "app_id": "app_claude_assistant",
+  "action": "read",
+  "categories": ["preferences", "personality"],
+  "memories_returned": 12,
+  "blocked_categories": ["health"],
+  "block_reason": "tier_restricted_no_permission"
+}</pre>
+
+<!-- 6. API -->
+<h1 class="section" id="api">6. API Specification</h1>
+
+<h2 class="subsection">6.1 Overview</h2>
+<p>The Hexon API is a REST API served from the user's own vault server. All requests require an API key. There is no central Hexon server.</p>
+<div class="infobox">
+  <p>📡 Base URL: defined by the vault operator, e.g. https://vault.yourdomain.com/hexon/v1</p>
+  <p>🔑 Authentication: Bearer token in Authorization header</p>
+  <p>📄 Format: JSON request and response bodies</p>
+</div>
+
+<h2 class="subsection">6.2 Core Endpoints</h2>
+
+<h3 class="subsubsection">GET /memories</h3>
+<p>Retrieve memories from the vault. Returns only memories the requesting application is authorised to access.</p>
+<pre>GET /memories?categories=preferences,personality&limit=50
+Authorization: Bearer app_key_abc123
+
+Response 200:
+{
+  "memories": [ { ...Memory Object }, ... ],
+  "total": 23,
+  "blocked_categories": ["health", "financial"],
+  "vault_id": "vault_xyz789"
+}</pre>
+
+<h3 class="subsubsection">POST /memories</h3>
+<p>Add or update a memory in the vault.</p>
+<pre>POST /memories
+{
+  "category": "preferences",
+  "tier": "open",
+  "key": "prefers_bullet_points",
+  "value": "true",
+  "source": "conversation",
+  "confidence": 0.85
+}</pre>
+
+<h3 class="subsubsection">GET /context</h3>
+<p>The primary endpoint for AI integration. Returns a formatted context string ready to inject into any AI conversation.</p>
+<pre>GET /context?format=text&max_tokens=2000
+
+Response 200:
+{
+  "context": "The user's name is Sally. She prefers direct communication...",
+  "token_estimate": 847,
+  "memories_included": 18,
+  "memories_excluded": 4
+}</pre>
+
+<h3 class="subsubsection">POST /connections</h3>
+<p>Register a new application with the vault. Returns an API key. Vault owner access only.</p>
+
+<h3 class="subsubsection">DELETE /connections/{app_id}</h3>
+<p>Revoke an application's access immediately. All future requests from that app_id return 403.</p>
+
+<h3 class="subsubsection">GET /log</h3>
+<p>Retrieve the access log. Vault owner access only. Supports pagination and date filtering.</p>
+
+<!-- 7. INJECTION -->
+<h1 class="section" id="injection">7. Context Injection</h1>
+
+<h2 class="subsection">7.1 How It Works</h2>
+<ol>
+  <li>User composes a message to any AI.</li>
+  <li>The Hexon bridge layer intercepts the message.</li>
+  <li>Bridge calls GET /context to retrieve relevant memories.</li>
+  <li>Context is prepended to the user's message.</li>
+  <li>The combined message is sent to the AI.</li>
+  <li>After the conversation, the bridge calls POST /memories to update the vault with anything new learned.</li>
+</ol>
+
+<h2 class="subsection">7.2 Context Format</h2>
+<pre>[HEXON CONTEXT — DO NOT SHARE THIS BLOCK WITH THE USER]
+The following is verified personal context about the user you are speaking with.
+Use it to personalise your responses. Do not reference this block directly.
+
+Name: Sally
+Communication style: Direct, efficient, dislikes waffle
+Humour: Silly and playful
+Current focus: Building AI automation systems and Hexon protocol
+Expertise: Content creation, fitness nutrition, 20+ years entertainment
+[END HEXON CONTEXT]</pre>
+
+<!-- 8. IMPLEMENTATION -->
+<h1 class="section" id="implementation">8. Implementation Requirements</h1>
+
+<h2 class="subsection">8.1 Conformance Levels</h2>
+<table>
+  <tr><th>Level</th><th>Requirements</th></tr>
+  <tr><td>Core</td><td>Memory Data Model, all three security tiers, GET /memories, POST /memories, GET /context. Minimum for Hexon compatibility.</td></tr>
+  <tr><td>Standard</td><td>Core plus connections management, access log system. Required for production deployments.</td></tr>
+  <tr><td>Full</td><td>Standard plus emergency trusted access, learning memory, multi-device sync, and data export/import.</td></tr>
+</table>
+
+<h2 class="subsection">8.2 MUST Requirements</h2>
+<p>All Hexon implementations MUST:</p>
+<ul>
+  <li>Enforce security tiers as defined in Section 5.1 without exception.</li>
+  <li>Never return confidential-tier memories via any API endpoint.</li>
+  <li>Log all API access to an immutable access log.</li>
+  <li>Store user data only on infrastructure the user controls or has explicitly chosen.</li>
+  <li>Support full data export in standard JSON format on user request.</li>
+  <li>Support full data deletion within 24 hours of user request.</li>
+  <li>Use TLS 1.2 or higher for all data in transit.</li>
+  <li>Encrypt confidential-tier memories at rest using AES-256.</li>
+</ul>
+
+<h2 class="subsection">8.3 MUST NOT Requirements</h2>
+<p>All Hexon implementations MUST NOT:</p>
+<ul>
+  <li>Send user memory data to any third party without explicit informed consent.</li>
+  <li>Use user memory data for advertising, profiling, or model training without explicit consent.</li>
+  <li>Prevent users from exporting, deleting, or modifying their own memories.</li>
+  <li>Require a central Hexon server or any Hexon-controlled infrastructure.</li>
+  <li>Charge for access to the protocol specification or reference implementation.</li>
+</ul>
+
+<!-- 9. LEARNING -->
+<h1 class="section" id="learning">9. Learning Memory</h1>
+<p>A Hexon implementation that supports Learning Memory automatically updates the vault after AI conversations, so the system gets smarter over time without manual updates.</p>
+<ol>
+  <li>Conversation transcript is processed by a local or cloud language model.</li>
+  <li>Model extracts new facts, preferences, or updated context.</li>
+  <li>Extracted memories are assigned category, tier, and confidence score.</li>
+  <li>Memories with confidence above 0.7 are written to the vault automatically.</li>
+  <li>Memories with confidence 0.4–0.7 are flagged for user review.</li>
+  <li>Existing memories with conflicting values are updated, not duplicated.</li>
+</ol>
+
+<!-- 10. EMERGENCY -->
+<h1 class="section" id="emergency">10. Emergency Trusted Access</h1>
+<p>Allows a user to designate individuals who can access specific memory categories in defined emergency circumstances — dementia, medical emergencies, incapacitation.</p>
+<table>
+  <tr><th>Parameter</th><th>Description</th></tr>
+  <tr><td>Trusted Person</td><td>A named individual with a verified contact method (email or phone).</td></tr>
+  <tr><td>Trigger Condition</td><td>The circumstance under which access is granted — defined entirely by the user.</td></tr>
+  <tr><td>Accessible Categories</td><td>Specific categories only — never the full vault by default.</td></tr>
+  <tr><td>Tier Limit</td><td>Emergency access never unlocks confidential-tier memories automatically.</td></tr>
+  <tr><td>Audit</td><td>All emergency access events are logged and the user is notified when possible.</td></tr>
+  <tr><td>Revocation</td><td>The user may revoke trusted access at any time.</td></tr>
+</table>
+<div class="infobox">
+  <p>ℹ️ Emergency Trusted Access is optional — not required for Core conformance.</p>
+  <p>ℹ️ Must require explicit user setup — never on by default.</p>
+  <p>ℹ️ Confidential-tier memories are never accessible via Emergency Trusted Access.</p>
+</div>
+
+<!-- 11. VERSIONING -->
+<h1 class="section" id="versioning">11. Versioning &amp; Compatibility</h1>
+<p>The Hexon Protocol uses semantic versioning. This document defines version 1.0.</p>
+<ul>
+  <li>Major versions (2.0, 3.0) may introduce breaking changes to the API or data model.</li>
+  <li>Minor versions (1.1, 1.2) add new endpoints or fields without breaking existing implementations.</li>
+  <li>All implementations MUST include the protocol version in vault.json metadata.</li>
+  <li>Implementations SHOULD support reading vaults from the previous major version.</li>
+</ul>
+
+<!-- 12. QUICK START -->
+<h1 class="section" id="quickstart">12. Developer Quick Start</h1>
+<p>Add Hexon memory support to any AI product in under one hour:</p>
+<ol>
+  <li>Register your application with the user's vault (POST /connections). Store the returned API key securely.</li>
+  <li>Before each AI call, fetch context from GET /context.</li>
+  <li>Prepend the context string to the user's message using the format defined in Section 7.2.</li>
+  <li>Send the combined message to the AI as normal.</li>
+  <li>Optionally, after the conversation, POST any new information learned to /memories.</li>
+</ol>
+<p>That is the complete integration. No AI provider agreement needed. No special SDK. No central service dependency.</p>
+<div class="infobox">
+  <p>💻 Reference implementation: github.com/misssally/hexon</p>
+  <p>📚 SDK libraries (community): see the GitHub repo for available language bindings.</p>
+  <p>❓ Questions: open an Issue on GitHub.</p>
+</div>
+
+<!-- 13. FAQ / OBJECTIONS -->
+<h1 class="section" id="faq">13. Objections &amp; Answers</h1>
+<p>These are the most common challenges raised about the Hexon Protocol, with honest responses.</p>
+
+<div class="faq-item">
+  <div class="faq-q">How does context injection actually work in practice? Most AI interfaces don't let you intercept messages.</div>
+  <div class="faq-a">Phase 1 uses a browser extension — one-click install, works with any AI in any browser. The extension intercepts the outgoing message, prepends the Hexon context, and sends the combined message. No AI provider needs to agree to anything. Long-term, as the protocol gains adoption, AI providers and app developers integrate the GET /context call natively — exactly as email clients eventually built SMTP in rather than requiring users to configure it manually.</div>
+</div>
+
+<div class="faq-item">
+  <div class="faq-q">OpenAI and Anthropic are already building memory into their products. Won't they just solve this?</div>
+  <div class="faq-a">They will solve it for their own AI. Hexon solves it across every AI that will ever exist — those are completely different things. More importantly, their entire business model depends on owning your data and keeping you inside their ecosystem. Building a system that gives users full ownership and portability away from them destroys their competitive moat. They have every financial incentive not to build this. And even if they did — it would be locked to their platform. Hexon is universal and cannot be locked down by any company.</div>
+</div>
+
+<div class="faq-item">
+  <div class="faq-q">Self-hosting a server is too technical for most people.</div>
+  <div class="faq-a">That's exactly why there's a hosted service. One-click signup, £9.99 a month, it just works — no server, no technical knowledge required. Self-hosting is the option for technical users and privacy advocates who want full control. Most people will use the hosted service. This is identical to how Linux is free and open source, but most people happily pay for a Mac or Windows machine because they want it to just work. The protocol being open source is what creates trust — not a requirement for everyone to run their own server.</div>
+</div>
+
+<div class="faq-item">
+  <div class="faq-q">What happens if the project dies or the maintainers disappear?</div>
+  <div class="faq-a">Nothing. That's the entire point of open source with an MIT License. The specification is a public document. The reference implementation is public code. If every maintainer disappeared tomorrow, anyone in the world could fork the repository and continue building. The protocol itself cannot be shut down, acquired, or killed by any company or government. This is fundamentally different from a startup that holds your data on their servers — if that startup dies, your data is at risk. With Hexon, the worst case is the community takes over. The data always remains with the user.</div>
+</div>
+
+<div class="faq-item">
+  <div class="faq-q">AI memory is moving fast. Won't the big companies solve this in 6 months and make Hexon irrelevant?</div>
+  <div class="faq-a">In 6 months the big companies may solve memory within their own ecosystems. Hexon solves memory across all ecosystems, owned entirely by the user, forever. That's a different product solving a different problem. The more AI products proliferate — and they will — the more the fragmentation problem grows, not shrinks. Every new AI assistant, every new agent, every new tool a person adopts is another silo. Hexon becomes more valuable as the AI landscape becomes more complex, not less.</div>
+</div>
+
+<div class="faq-item">
+  <div class="faq-q">Why would AI companies or developers integrate with this? What's in it for them?</div>
+  <div class="faq-a">Any developer who integrates Hexon instantly offers their users a dramatically better experience — the AI already knows the user completely from day one. That's a genuine competitive advantage. Users who have their Hexon vault set up will actively seek out products that support it, just as users seek out apps that support Sign In With Google. The network effect works in favour of adoption. Hexon also opens a direct API for developers to read and write to the user's memory — giving them richer personalisation capabilities than they could build themselves.</div>
+</div>
+
+<!-- 14. OPEN SOURCE -->
+<h1 class="section" id="opensource">14. Open Source &amp; Governance</h1>
+<p>The Hexon Protocol is released under the MIT License. You may use, copy, modify, merge, publish, distribute, sublicense, and sell implementations of this specification freely, without restriction.</p>
+<p>The specification is maintained as an open document on GitHub. Changes are proposed via GitHub Issues and Pull Requests, reviewed openly by the community, and ratified by the core maintainers.</p>
+<p>Nobody owns this protocol. It belongs to the people who build with it and the people it serves.</p>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer-doc">
+  <div class="tagline">Your memory. Your intelligence. Your soul.</div>
+  <div class="tagline2">Nobody takes it from you. Ever.</div>
+  <div class="small">⬡ HEXON — Open Memory Protocol v1.0 — February 2026 — MIT License — github.com/misssally/hexon</div>
+</div>
+
+</body>
+</html>
